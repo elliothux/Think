@@ -1,4 +1,3 @@
-
 {
   "compilerOptions": {
     "module": "commonjs",
@@ -6,6 +5,7 @@
     "removeComments": true,
     "preserveConstEnums": true,
     "sourceMap": true,
-    "target": "esnext"
+    "target": "es2017",
+    "lib": ["Dom", "ES2016"]
   }
 }
