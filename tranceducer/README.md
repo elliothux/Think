@@ -42,18 +42,31 @@ const data: number = trans(range(0, 100));
 
 不难发现，compose 函数需要对每一个传入的函数进行组合并将其转换为 Transducer，这要求传入的每一个函数都是可组合的（Composable）。也就是说每一个被组合的函数在必须在参数与返回值上都具有通用性，但默认的 map、filter 与 reduce 并不满足这一要求，因此我们需要将它们重新封装一遍使其具有统一的参数和返回值模式。
 
-不管是 map、filter 还是 forEach 都是对集合的遍历操作，所有的遍历操作都能用 reduce 实现，因此我们使用 reduce 封装出 map 与 filter 使其满足与 reduce 相同的参数与返回值模式。
+不管是 map、filter 还是 forEach 都是对集合的遍历操作，所有的遍历操作都能用 reduce 实现，因此我们使用 reduce 封装出 map 与 filter 使其满足相同的参数与返回值模式。
 
 ```typescript
-const mapReducer = (f) => (result, item) => {
+const mapReducer = <T> (f: (T) => any) => (result: any, item: T) => {
     result.push(f(item));
     return result;
-}
-const filterReducer = (predicate) => (result, item) => {
+};
+
+const filterReducer = <T> (predicate: (T) => boolean) => (result: any, item: T) => {
     if (predicate(item)) {
         result.push(item);
     }
     return result;
-}
+};
+
+const data: number = range(0, 100)
+    .reduce(filterReducer(odd), [])
+    .reduce(mapReducer(pow2), [])
+    .reduce(sum, 0);
+console.log(data);		// 166650
+```
+
+现在，我们可以直接使用 mapReducer 与 filterReducer来替代 map 与 filter，它们返回的函数具有相同的参数与返回值模式，在 TS 中可以表示为`type Reducing<T> = (any, T) => any;`。我们在此基础上继续做一层抽象，让 Reducing 可以从外部传入：
+
+```typescript
+
 ```
 
