@@ -96,7 +96,7 @@ const compose = (...f: ((...any) => any)[]): Reducing<any> => {
 };
 ```
 
-compose 函数接受一个 Reducing 函数一系列的高阶函数：`(((a, b, …, n) → o), (o → p), …, (x → y), (y → z)) → ((a, b, …, n) → z)`，compose 函数将参数中第一个函数作为参数调用第二个函数，然后将返回的函数作为参数继续依次调用参数中的函数，最终得到一个新的 Reducing 函数，我们把它叫做 Transducer。
+compose 函数接受一个 Reducing 函数及一系列的高阶函数：`(((a, b, …, n) → o), (o → p), …, (x → y), (y → z)) → ((a, b, …, n) → z)`，compose 函数将参数中第一个函数作为参数调用第二个函数，然后将返回的函数作为参数继续依次调用参数中的函数，最终得到一个新的 Reducing 函数，我们把它叫做 Transducer。
 
 现在，用 compose 来组合一系列函数：
 
