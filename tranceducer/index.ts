@@ -1,37 +1,45 @@
 
-import { range } from '../utils';
+import { range, even } from '../utils';
 
-// 假设我们需要找出 100 以内能被 3 整除的所有奇数的平方和
-const odd = (num: number): boolean => num % 2 !== 0;
-const pow2 = (num: number): number => Math.pow(num, 2);
 const sum = (cum: number, num: number): number => cum + num;
-const data1 = range(0, 100).filter(odd).map(pow2).reduce(sum, 0);
-console.log(data1);
 
 
-const mapReducer = <T> (f: (T) => any) => (result: any, item: T) => {
-    result.push(f(item));
-    return result;
+// 实现 Transducer
+type Reducing<T, U> = (T, U) => T;
+type F<T, U> = (T) => U;
+
+const map = <T, U> (f: F<T, U>) => (reducing: Reducing<U[], U>) => (result: U[], item: U) => reducing(result, f(item));
+
+const filter = <T> (predicate: F<T, boolean>) => (reducing: Reducing<T[], T>) => (result: T[], item: T) => predicate(item) ? reducing(result, item) : result;
+
+const compose = (...f: ((...any) => any)[]): Reducing<any, any> => {
+    const [r, ...fs] = [...f].reverse();
+    return [...fs].reduce((res, fn) => fn(res), r);
 };
 
-const filterReducer = <T> (predicate: (T) => boolean) => (result: any, item: T) => {
-    if (predicate(item)) {
-        result.push(item);
-    }
-    return result;
-};
 
-const data2 = range(0, 100)
-    .reduce(filterReducer(odd), [])
-    .reduce(mapReducer(pow2), [])
+
+// 求出小于 1000000 的所有为 7 的倍数且个位数为偶数且该数的前一位不能被 4 整除的数字的之和：
+const trans3: Reducing<number, number> = compose(
+    filter(x => x % 7 === 0),
+    filter(x => even(x % 10)),
+    filter(x => (x - 1) % 4 !== 0),
+    map(x => x * x),
+    sum
+);
+
+console.time("With transducer");
+const result1 = range(0, 1000000).reduce(trans3, 0);
+console.log(result1);
+console.timeEnd("With transducer");
+
+
+console.time("Without transducer");
+const result2 = range(0, 1000000)
+    .filter(x => x % 7 === 0)
+    .filter(x => even(x % 10))
+    .filter(x => (x - 1) % 4 !== 0)
+    .map(x => x * x)
     .reduce(sum, 0);
-console.log(data2);
-
-
-type Reducing<T> = (any, T) => any;
-const mapping = <T> (f: (T) => any) => (reducing: Reducing<T>) => (result: any, item: T) => reducing(result, f(item));
-const filtering = <T> (predicate: (T) => boolean) => (reducing: Reducing<T>) => (result: any, item: T) => predicate(item) ? reducing(result, item) : result;
-const trans = filtering(odd)(mapping(pow2)(sum));
-const data3 = range(0, 100)
-    .reduce(trans, 0);
-console.log(data3);
+console.log(result2);
+console.timeEnd("Without transducer");
