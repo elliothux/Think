@@ -2,4 +2,4 @@
 我的学习思考笔记, 持续更新中~
 
 ### Functional JavaScript 系列
-* Transducer
+* [Transducer](https://github.com/HuQingyang/Think/tree/master/tranceducer)
