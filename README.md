@@ -3,3 +3,6 @@
 
 ### Functional JavaScript 系列
 * [Transducer](https://github.com/HuQingyang/Think/tree/master/tranceducer)
+
+## 杂项
+* [React Web App Optimization In Real World](https://github.com/HuQingyang/Think/tree/master/react-optiomize)

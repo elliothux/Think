@@ -25,13 +25,13 @@
 下面我将结合最近在开发的 Tolstoy（托尔斯泰，Tolstoy.oa.com： 一个以 PB 为核心的自动化测试系统）来讲怎么一步一步地优化 Web 性能。
 首先，我们需要我们需要找出我们的性能瓶颈所在：打开 Chrome  Performance Inspect，点击记录并刷新页面，记录完成。
 
-![](React%20Web%20App%20Optimization%20In%20Real%20World/81D26BFB-053A-4D41-B88E-52D2428FC29B.png)
+![](pic/81D26BFB-053A-4D41-B88E-52D2428FC29B.png)
 
-![](React%20Web%20App%20Optimization%20In%20Real%20World/BCAEE365-42AC-4EC8-942E-843A501AB511.png)
+![](pic/BCAEE365-42AC-4EC8-942E-843A501AB511.png)
 
 我们看到：虽然 bundle.js 主文件在 676ms 之后已经加载完毕，但 2s 之后才开始加载出主页面。
 
-![](React%20Web%20App%20Optimization%20In%20Real%20World/716705CF-CEA1-4EC6-8AFE-A1938E0A29D9.png)
+![](pic/716705CF-CEA1-4EC6-8AFE-A1938E0A29D9.png)
 
 继续看发现解析和执行 bundle.js 花了 1.47s，也就是说在请求完 bundle.js 后的 1.47s 之内页面都处于完全空白状态，这导致在2s 之后 App 才初始化完毕，严重影响用户体验！
  
@@ -70,22 +70,20 @@ module.exports = {
 ```
 2. 然后在 Terminal 里运行 `webpack --config ./config/webpack.dll.js`，打包出 dll chunks。
 3. 最后，在 webpack 配置文件里加上：
-```json
+```javascript
 {
-	  ...
-	  plugins: [
-	  ...
-	  new webpack.DefinePlugin(env.stringified),
+    plugins: [
+        new webpack.DefinePlugin(env.stringified),
         ...['react', 'lib', 'antd'].map(name => new webpack.DllReferencePlugin(({
             context: __dirname,
             manifest: require(`../dll/${name}-manifest.json`),
         }))),
-    new AddAssetHtmlPlugin(['react', 'lib', 'antd'].map(name => ({
+        new AddAssetHtmlPlugin(['react', 'lib', 'antd'].map(name => ({
             filepath: require.resolve(`../dll/${name}.dll.js`),
             hash: true,
             includeSourcemap: false
-        }))),
-	  ]
+        })))
+    ]
 }
 ```
 
@@ -107,18 +105,18 @@ function lazy(Component) {
 }
 ```
 3. 在组件声明时使用 LazyLoad 封装：
-![](React%20Web%20App%20Optimization%20In%20Real%20World/C8F54BE2-1FE4-4837-A70F-C5B090EA8ED1.png)
+![](pic/C8F54BE2-1FE4-4837-A70F-C5B090EA8ED1.png)
 当然，如果你不喜欢装饰器语法，也可写成`export default lazy(Uploader);`
 
 经过上面的步骤，再次进行性能测量：
 
-![](React%20Web%20App%20Optimization%20In%20Real%20World/3B78871B-8403-4C36-B0BD-84A59A80FAC8.png)
+![](pic/3B78871B-8403-4C36-B0BD-84A59A80FAC8.png)
 
 Bingo！我们的 App 的初始化耗时从 2s 优化到 700 ms，速度提升 65%！
 
 ## 3. 提升应用内响应
-	除了初始化速度之外，App 内的响应速度也是优化的一方面。得益于 React 优秀的设计与 VirtualDOM 高效的 Diff 与 Patch，开发者并不需要特别需要关注 App 的性能，唯一需要注意的是：尽量避免不必要的 rerender。
-	这里我们需要使用另一个工具：[why-did-you-update](https://github.com/maicki/why-did-you-update)，它会在 Virtual-DOM 产生不必要的更新时轰炸你的控制台！
+除了初始化速度之外，App 内的响应速度也是优化的一方面。得益于 React 优秀的设计与 VirtualDOM 高效的 Diff 与 Patch，开发者并不需要特别需要关注 App 的性能，唯一需要注意的是：尽量避免不必要的 rerender。
+这里我们需要使用另一个工具：[why-did-you-update](https://github.com/maicki/why-did-you-update)，它会在 Virtual-DOM 产生不必要的更新时轰炸你的控制台！
 
 首先，运行 `npm install --save-dev why-did-you-update`。
 然后，编辑你的入口文件：
@@ -130,7 +128,7 @@ if (process.env.NODE_ENV !== 'production') {
 ```
 
 最后，刷新页面：
-![](React%20Web%20App%20Optimization%20In%20Real%20World/7640CD18-7170-4975-A7ED-1708F0521C40.png)
+![](pic/7640CD18-7170-4975-A7ED-1708F0521C40.png)
 
 可以看到 “Route” 组件有 10 次不必要的 rerender，“Route” 是在 “App” 组件内被引入的，我们看 “App” 组件：
 ```jsx harmony
@@ -159,7 +157,7 @@ class App extends PureComponent { ... }
 ```
 
 另外，在每次删除用例（去掉表格中的一行）时，也会产生 render：
-![](React%20Web%20App%20Optimization%20In%20Real%20World/58112FD2-32B9-43F1-8B37-756D1BAD1D3C.png)
+![](pic/58112FD2-32B9-43F1-8B37-756D1BAD1D3C.png)
 
 我们看 render 该表格的组件：
 ```jsx harmony
@@ -184,9 +182,9 @@ class UseCaseList extends Component {
 
 在这里渲染 List 时使用了 `key = index` ，这会在去掉 List 中的一个 Item 时，引起该 Item 之后的所有 Item 重新渲染。
 因为 React 的虚拟 DOM 会使用依赖一个独一无二的 Key 去缓存一个节点，避免反复渲染。现在假设我们在一个 List 中有如图6个 Item 使用 Index 作为 Key 渲染：
-![](React%20Web%20App%20Optimization%20In%20Real%20World/70B7ACCC-1CAC-4515-BEB7-7FB90B91B47F.png)
+![](pic/70B7ACCC-1CAC-4515-BEB7-7FB90B91B47F.png)
 当我们删掉 “C” item 时：
-![](React%20Web%20App%20Optimization%20In%20Real%20World/6E5E3D97-509B-41BE-BC57-6F866EEB1D1E.png)
+![](pic/6E5E3D97-509B-41BE-BC57-6F866EEB1D1E.png)
 “C” 之后的所有 Item 的 Key 都会发生改变，一旦 Key 发生改变，React 就会认为这是一个新的组件二把它重新渲染一般，显然这会造成性能浪费。因此，应该**合理使用 Key** 来避免 rerender。
 
 因此，我们渲染 Table 的数据可以改为：
@@ -194,7 +192,7 @@ class UseCaseList extends Component {
 ucses.map((i, index) => ({ ...i, key: i.id }))
 ```
 
-还有很多其他的优化点如：**使用 shouldComponentUpdate**、**使用 Immutable.js**、**使用 Shallow Compare**、**使用无状态组件（Pure Function）**等，由于篇幅及时间原因这里不再赘述。
+还有很多其他的优化点如：**使用 shouldComponentUpdate**、**使用 Immutable.js**、**使用 Shallow Compare**、**使用无状态组件（Pure Function** 等，由于篇幅及时间原因这里不再赘述。
 
 该系列持续更新，欢迎关注 [HuQingyang (胡青杨) · GitHub](https://github.com/HuQingyang)
 
