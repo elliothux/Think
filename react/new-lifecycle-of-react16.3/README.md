@@ -1,5 +1,5 @@
 # 谈谈新的 React 新的生命周期钩子
-在 React 16.3 中，Facebook 的工程师们给 React 带来一系列的新的特性，如 suspense 和 time slicing 等，这些都为 React 接下来即将到来的异步渲染机制做准备，有兴趣的可以看[Sophie Alpert 在 JSConf Iceland 2018 的演讲](https://www.youtube.com/watch?v=v6iR3Zk4oDY)。
+在 React 16.3 中，Facebook 的工程师们给 React 带来一系列的新的特性，如 suspense 和 time slicing 等，这些都为 React 接下来即将到来的异步渲染机制做准备，有兴趣的可以看[ Sophie Alpert 在 JSConf Iceland 2018 的演讲](https://www.youtube.com/watch?v=v6iR3Zk4oDY)。
 
 像 time slicing 等 React 内部优化特性，在 API 层面不会有太大变化，而 API 层面最大的变化，应该在生命周期钩子。
 
@@ -64,4 +64,5 @@ React 新增的 getSnapshotBeforeUpdate 方法就是为了解决上述问题，�
 
 ## 总结
 React 近来 API 变化十分大，React 团队很长时间以来一直在实现异步渲染机制，目前的特性只是为异步渲染做准备，预计 React 在 17 版本发布时，性能会取得巨大的提升，期待中。。。
+
 PS：从 Sophie Alpert 演示的两个 DEMO 上看，异步渲染的高效确实十分惊艳，有兴趣的可以看文章开头的演讲。
