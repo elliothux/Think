@@ -1,19 +1,16 @@
-# Hexo Configuration
 ## Docs: https://hexo.io/docs/configuration.html
-## Source: https://github.com/hexojs/hexo/
 
 # Site
 title: Aedron
 subtitle: Do Creative.
-description:
-keywords:
+description: 在程序猿与设计狮之前反复跃迁
+keywords: Blog
 author: 青杨
-language:
-timezone:
+language: zh
+timezone: UTC
 
 # URL
-## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
-url: http://yoursite.com
+url: http://do.codes
 root: /
 permalink: :year/:month/:day/:title/
 permalink_defaults:
@@ -70,12 +67,12 @@ time_format: HH:mm:ss
 per_page: 10
 pagination_dir: page
 
-# Extensions
+# Extension
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
 theme: Material-T
 
-# Deployment
-## Docs: https://hexo.io/docs/deployment.html
 deploy:
-  type:
+  type: git
+  repo: https://github.com/aedron/aedron.github.io.git
+  branch: master
