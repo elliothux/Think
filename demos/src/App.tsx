@@ -1,10 +1,12 @@
 import * as React from 'react';
 import { Route, Switch, Link } from 'wouter';
 import { HooksExample } from './hooks';
+import { PromiseExample } from './promise';
 
 const demos = {
   '/': Demos,
   '/hooks': HooksExample,
+  '/promise': PromiseExample,
 };
 
 export function App() {
@@ -21,10 +23,8 @@ function Demos() {
   return (
     <ul>
       {Object.keys(demos).map((path) => (
-        <li>
-          <Link key={path} href={path}>
-            {path}
-          </Link>
+        <li key={path}>
+          <Link href={path}>{path}</Link>
         </li>
       ))}
     </ul>
